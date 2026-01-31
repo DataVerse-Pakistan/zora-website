@@ -53,11 +53,35 @@ export function B2BSection() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const response = await fetch('/api/b2b', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.contactName,
+          email: formData.email,
+          company: formData.institutionName,
+          phone: formData.phone,
+          role: '',
+          companySize: formData.estimatedStudents ? `${formData.estimatedStudents}+` : '',
+          requirements: formData.requirements,
+        }),
+      });
 
-    setIsSubmitting(false);
-    setIsSubmitted(true);
+      const data = await response.json();
+
+      if (data.success) {
+        setIsSubmitted(true);
+      } else {
+        alert(data.message || 'Failed to submit request. Please try again.');
+      }
+    } catch (error) {
+      alert('Failed to submit request. Please try again later.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleInputChange = (
