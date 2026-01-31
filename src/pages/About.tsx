@@ -1,41 +1,40 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Users, Target, Award, Globe } from 'lucide-react';
+import { ArrowLeft, Users, Target, Award, Globe, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Navbar } from '@/components/Navbar';
+import { Footer } from '@/components/Footer';
 
 const About = () => {
   const navigate = useNavigate();
+  const [isWizardOpen, setIsWizardOpen] = useState(false);
+
+  const handleGetStarted = () => {
+    setIsWizardOpen(true);
+  };
 
   return (
     <div className="min-h-screen">
+      <Navbar onGetStarted={handleGetStarted} />
+
       {/* Navigation */}
       <motion.nav
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6 }}
         className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/10"
+        style={{ top: '80px' }}
       >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
+          <div className="flex items-center h-16">
             <button
               onClick={() => navigate('/')}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
             >
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-zora-purple flex items-center justify-center">
-                <span className="text-xl font-bold text-primary-foreground">Z</span>
-              </div>
-              <span className="font-display text-2xl font-bold text-foreground">
-                Zora
-              </span>
+              <ArrowLeft className="w-4 h-4" />
+              <span className="text-sm">Back to Home</span>
             </button>
-            <Button
-              onClick={() => navigate('/')}
-              variant="outline"
-              className="border-white/20 hover:bg-white/10"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Home
-            </Button>
           </div>
         </div>
       </motion.nav>
@@ -203,7 +202,7 @@ const About = () => {
               Ready to Transform Your Child's Education?
             </h2>
             <Button
-              onClick={() => navigate('/')}
+              onClick={handleGetStarted}
               size="lg"
               className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8"
             >
@@ -212,6 +211,8 @@ const About = () => {
           </motion.div>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 };

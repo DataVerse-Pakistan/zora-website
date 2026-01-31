@@ -1,11 +1,15 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Mail, Phone, MapPin, ExternalLink } from 'lucide-react';
+import { ArrowRight, Mail, Phone, MapPin, ExternalLink, Loader2 } from 'lucide-react';
 import { env } from '@/config/env';
 import { useNavigate } from 'react-router-dom';
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
   const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [isSubscribing, setIsSubscribing] = useState(false);
+  const [subscriptionStatus, setSubscriptionStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   const handleScroll = (href: string) => {
     if (href.startsWith('#')) {
@@ -25,8 +29,8 @@ export function Footer() {
   const footerLinks = {
     product: [
       { label: 'Features', href: '#features', onClick: () => handleScroll('#features') },
-      { label: 'Pricing', href: '#pricing', onClick: () => handleScroll('#pricing') },
       { label: 'Roadmap', href: '#roadmap', onClick: () => handleScroll('#roadmap') },
+      { label: 'Pricing', href: '#pricing', onClick: () => handleScroll('#pricing') },
       { label: 'For Schools', href: '#b2b', onClick: () => handleScroll('#b2b') },
     ],
     company: [
@@ -38,6 +42,37 @@ export function Footer() {
       { label: 'Privacy Policy', href: '/privacy', onClick: () => navigate('/privacy') },
       { label: 'Terms of Service', href: '/terms', onClick: () => navigate('/terms') },
     ],
+  };
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    
+    setIsSubscribing(true);
+    setSubscriptionStatus('idle');
+
+    try {
+      const response = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setSubscriptionStatus('success');
+        setEmail('');
+      } else {
+        setSubscriptionStatus('error');
+      }
+    } catch (error) {
+      setSubscriptionStatus('error');
+    } finally {
+      setIsSubscribing(false);
+    }
   };
 
   return (
@@ -148,18 +183,41 @@ export function Footer() {
                 Get the latest news on new features and educational insights.
               </p>
             </div>
-            <div className="flex gap-3">
+            <form onSubmit={handleNewsletterSubmit} className="flex gap-3">
               <input
                 type="email"
                 placeholder="Enter your email"
-                className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isSubscribing}
+                className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary disabled:opacity-50"
+                required
               />
-              <button className="px-6 py-3 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold transition-colors flex items-center gap-2">
-                Subscribe
-                <ArrowRight className="w-4 h-4" />
+              <button 
+                type="submit" 
+                disabled={isSubscribing}
+                className="px-6 py-3 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold transition-colors flex items-center gap-2 disabled:opacity-50"
+              >
+                {isSubscribing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Subscribing...
+                  </>
+                ) : (
+                  <>
+                    Subscribe
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
               </button>
-            </div>
+            </form>
           </div>
+          {subscriptionStatus === 'success' && (
+            <p className="text-green-400 text-sm mt-3">Successfully subscribed to our newsletter!</p>
+          )}
+          {subscriptionStatus === 'error' && (
+            <p className="text-red-400 text-sm mt-3">Failed to subscribe. Please try again later.</p>
+          )}
         </div>
 
         {/* Bottom Bar */}

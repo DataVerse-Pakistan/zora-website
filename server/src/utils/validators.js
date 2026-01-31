@@ -67,6 +67,14 @@ export const b2bFormSchema = Joi.object({
   }),
 });
 
+export const newsletterSchema = Joi.object({
+  email: Joi.string().email().max(254).trim().required().messages({
+    'string.email': 'Please provide a valid email address',
+    'string.max': 'Email must not exceed 254 characters',
+    'any.required': 'Email is required',
+  }),
+});
+
 export const validateRequest = (schema, data) => {
   const { error, value } = schema.validate(data, {
     abortEarly: false,

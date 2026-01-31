@@ -1,6 +1,7 @@
 import express from 'express';
 import { handleContactForm } from '../controllers/contactController.js';
 import { handleB2BForm } from '../controllers/b2bController.js';
+import { handleNewsletterSubscription } from '../controllers/newsletterController.js';
 import { getConfigData, getAllConfigs } from '../handlers/configHandler.js';
 
 const router = express.Router();
@@ -59,5 +60,7 @@ router.get('/config/:type', (req, res) => {
 router.post('/contact', handleContactForm);
 
 router.post('/b2b', handleB2BForm);
+
+router.post('/newsletter', handleNewsletterSubscription);
 
 export default router;
